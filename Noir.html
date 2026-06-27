@@ -1,0 +1,3171 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="NOIR Barbershop — премиальная мужская парикмахерская. Профессиональные стрижки, моделирование бороды, уход за кожей. Запись онлайн.">
+<meta property="og:title" content="NOIR Barbershop — Премиальный барбершоп">
+<meta property="og:description" content="Каждая стрижка создаётся с учётом формы лица, структуры волос и вашего образа жизни.">
+<meta property="og:type" content="website">
+<title>NOIR Barbershop — Премиальный мужской барбершоп</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+
+<style>
+/* ============================================================
+   CSS VARIABLES — DESIGN SYSTEM
+   ============================================================ */
+:root {
+  --bg-primary:   #0C0C0D;
+  --bg-secondary: #111112;
+  --bg-card:      #161618;
+  --bg-card-hover:#1C1C1E;
+  --text-primary: #F5F5F0;
+  --text-secondary: #8A8A8E;
+  --text-muted:   #555558;
+  --gold:         #C9A84C;
+  --gold-light:   #E2C97E;
+  --gold-dim:     #7A6230;
+  --border:       rgba(255,255,255,0.07);
+  --border-gold:  rgba(201,168,76,0.25);
+  --radius-sm:    4px;
+  --radius-md:    8px;
+  --radius-lg:    16px;
+  --radius-xl:    24px;
+  --space-xs:     8px;
+  --space-sm:     16px;
+  --space-md:     24px;
+  --space-lg:     48px;
+  --space-xl:     80px;
+  --space-2xl:    120px;
+  --space-3xl:    160px;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --shadow-card:  0 2px 40px rgba(0,0,0,0.5);
+  --shadow-gold:  0 0 40px rgba(201,168,76,0.15);
+  --transition:   0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  /* Запрещает прокрутку контента по горизонтали */
+  overflow-x: hidden; 
+  
+  /* Гарантирует, что сайт не станет шире экрана телефона */
+  max-width: 100%; 
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+body.menu-open { overflow: hidden; }
+body.loading   { overflow: hidden; }
+
+img { max-width: 100%; display: block; }
+a   { text-decoration: none; color: inherit; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+/* ============================================================
+   LOADER
+   ============================================================ */
+#loader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+}
+
+.loader__logo {
+  font-family: var(--font-display);
+  font-size: 48px;
+  font-weight: 300;
+  letter-spacing: 0.25em;
+  color: var(--text-primary);
+  opacity: 0;
+}
+
+.loader__logo span { color: var(--gold); }
+
+.loader__line-wrap {
+  width: 240px;
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+
+.loader__line {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  transform-origin: left;
+}
+
+.loader__counter {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.loader__tagline {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  opacity: 0;
+}
+
+/* ============================================================
+   CURSOR
+   ============================================================ */
+.cursor {
+  position: fixed;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0);
+  pointer-events: none;
+  z-index: 9998;
+  mix-blend-mode: normal;
+  transition: transform 0.1s;
+}
+
+.cursor-follower {
+  position: fixed;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(201,168,76,0);
+  pointer-events: none;
+  z-index: 9997;
+  transition: transform 0.08s, width 0.3s, height 0.3s, opacity 0.3s;
+}
+
+@media (hover: none) { .cursor, .cursor-follower { display: none; } }
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 900;
+  padding: 0 48px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.5s, backdrop-filter 0.5s, border-color 0.5s;
+  border-bottom: 1px solid transparent;
+}
+
+.nav.scrolled {
+  background: rgba(12,12,13,0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-color: var(--border);
+}
+
+.nav__logo {
+  font-family: var(--font-display);
+  font-size: 26px;
+  font-weight: 300;
+  letter-spacing: 0.2em;
+  color: var(--text-primary);
+  transition: opacity var(--transition);
+}
+
+.nav__logo span { color: var(--gold); }
+.nav__logo:hover { opacity: 0.75; }
+
+.nav__links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+}
+
+.nav__links a {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  transition: color var(--transition);
+  position: relative;
+}
+
+.nav__links a::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--gold);
+  transition: width var(--transition);
+}
+
+.nav__links a:hover { color: var(--text-primary); }
+.nav__links a:hover::after { width: 100%; }
+
+.nav__cta {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.nav__phone {
+  font-size: 13px;
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+  transition: color var(--transition);
+}
+.nav__phone:hover { color: var(--gold); }
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: var(--gold);
+  color: #0C0C0D;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+
+.btn-primary:hover {
+  background: var(--gold-light);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 32px rgba(201,168,76,0.3);
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  transition: border-color var(--transition), color var(--transition), transform var(--transition);
+}
+
+.btn-outline:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-1px);
+}
+
+/* HAMBURGER */
+.nav__burger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  width: 28px;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.nav__burger span {
+  display: block;
+  height: 1.5px;
+  background: var(--text-primary);
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: center;
+}
+
+.nav__burger.active span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+.nav__burger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav__burger.active span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+/* FULLSCREEN MENU */
+.menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 800;
+  background: var(--bg-primary);
+  clip-path: circle(0% at calc(100% - 60px) 40px);
+  transition: clip-path 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+  display: flex;
+  align-items: center;
+  padding: 0 48px;
+}
+
+.menu-overlay.open {
+  clip-path: circle(150% at calc(100% - 60px) 40px);
+}
+
+.menu-overlay__inner {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.menu-overlay__nav {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 64px;
+}
+
+.menu-overlay__nav li {
+  overflow: hidden;
+}
+
+.menu-overlay__nav a {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(42px, 7vw, 80px);
+  font-weight: 300;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  transform: translateY(100%);
+  transition: color 0.3s;
+  position: relative;
+  padding-left: 0;
+}
+
+.menu-overlay__nav a:hover { color: var(--gold); }
+
+.menu-overlay__num {
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  vertical-align: super;
+  margin-right: 12px;
+  font-weight: 400;
+}
+
+.menu-overlay__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 40px;
+  border-top: 1px solid var(--border);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.5s ease 0.6s;
+}
+
+.menu-overlay.open .menu-overlay__footer {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.menu-overlay__phone {
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: 0.05em;
+  color: var(--text-primary);
+  transition: color 0.3s;
+}
+.menu-overlay__phone:hover { color: var(--gold); }
+
+.menu-overlay__socials {
+  display: flex;
+  gap: 24px;
+}
+
+.menu-overlay__socials a {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transition: color 0.3s;
+}
+.menu-overlay__socials a:hover { color: var(--gold); }
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 700px;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.hero__bg {
+  position: absolute;
+  inset: 0;
+  background: 
+    radial-gradient(ellipse 80% 60% at 70% 40%, rgba(201,168,76,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 70% at 20% 80%, rgba(201,168,76,0.04) 0%, transparent 50%),
+    linear-gradient(160deg, #0C0C0D 0%, #111112 50%, #0e0e0f 100%);
+}
+
+.hero__grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 0%, transparent 100%);
+}
+
+.hero__visual {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 55%;
+  overflow: hidden;
+}
+
+.hero__visual-inner {
+  position: absolute;
+  inset: 0;
+  background: 
+    linear-gradient(90deg, var(--bg-primary) 0%, transparent 30%),
+    linear-gradient(0deg, var(--bg-primary) 0%, transparent 25%),
+    url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 900"><defs><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/><feBlend in="SourceGraphic" mode="multiply"/></filter></defs><rect width="800" height="900" fill="%23141415" filter="url(%23noise)" opacity="0.8"/><circle cx="400" cy="350" r="200" fill="%23C9A84C" opacity="0.06"/><circle cx="600" cy="200" r="100" fill="%23C9A84C" opacity="0.04"/></svg>') center/cover;
+}
+
+.hero__scissors {
+  position: absolute;
+  right: 10%;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 320px;
+  opacity: 0.04;
+  color: var(--gold);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  font-family: serif;
+}
+
+.hero__content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 0 48px var(--space-2xl);
+  max-width: 800px;
+}
+
+.hero__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 32px;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.hero__eyebrow-line {
+  width: 40px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.hero__eyebrow-text {
+  font-size: 11px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 400;
+}
+
+.hero__title {
+  font-family: var(--font-display);
+  font-size: clamp(52px, 7vw, 96px);
+  font-weight: 300;
+  line-height: 1.0;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin-bottom: 28px;
+  overflow: hidden;
+}
+
+.hero__title-line {
+  display: block;
+  transform: translateY(110%);
+}
+
+.hero__title-line em {
+  font-style: italic;
+  color: var(--gold);
+}
+
+.hero__subtitle {
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--text-secondary);
+  max-width: 420px;
+  line-height: 1.7;
+  margin-bottom: 44px;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.hero__actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.hero__stats {
+  position: absolute;
+  right: 48px;
+  bottom: var(--space-2xl);
+  display: flex;
+  gap: 48px;
+  z-index: 2;
+  opacity: 0;
+}
+
+.hero__stat {}
+
+.hero__stat-num {
+  font-family: var(--font-display);
+  font-size: 44px;
+  font-weight: 300;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.hero__stat-num span { color: var(--gold); }
+
+.hero__stat-label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.hero__scroll {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  opacity: 0;
+}
+
+.hero__scroll-text {
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  writing-mode: vertical-rl;
+}
+
+.hero__scroll-dot {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, var(--gold), transparent);
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 1; transform: scaleY(1.2); }
+}
+
+/* ============================================================
+   SECTIONS — COMMON
+   ============================================================ */
+.section { padding: var(--space-2xl) 48px; }
+.section--dark { background: var(--bg-secondary); }
+
+.section__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.section__eyebrow-num {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  color: var(--gold);
+  font-weight: 400;
+}
+
+.section__eyebrow-line {
+  width: 30px;
+  height: 1px;
+  background: var(--gold);
+}
+
+.section__eyebrow-label {
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 400;
+}
+
+.section__title {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 4vw, 60px);
+  font-weight: 300;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.section__title em { font-style: italic; color: var(--gold); }
+
+.section__subtitle {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--text-secondary);
+  max-width: 520px;
+  line-height: 1.7;
+}
+
+.section__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 40px;
+  margin-bottom: 72px;
+}
+
+/* ============================================================
+   ABOUT
+   ============================================================ */
+.about {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.about__left {}
+
+.about__text {
+  font-size: 16px;
+  font-weight: 300;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-top: 32px;
+  margin-bottom: 24px;
+}
+
+.about__quote {
+  border-left: 2px solid var(--gold);
+  padding-left: 24px;
+  margin: 32px 0;
+}
+
+.about__quote-text {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-style: italic;
+  font-weight: 300;
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+.about__right {
+  position: relative;
+}
+
+.about__img-wrap {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.about__picture,
+.team__picture,
+.portfolio__picture{
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Картинка растянется без искажений */
+  border-radius: inherit; /* Повторит скругление углов родительского блока */
+}
+
+.about__img {
+  width: 100%;
+  aspect-ratio: 4/5;
+  background: linear-gradient(135deg, #1A1A1C 0%, #0F0F10 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.about__img-placeholder {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(ellipse 60% 60% at 50% 40%, rgba(201,168,76,0.08) 0%, transparent 70%),
+    linear-gradient(135deg, #1A1A1C 0%, #141416 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.about__img-icon {
+  font-size: 80px;
+  opacity: 0.12;
+}
+
+.about__badge {
+  position: absolute;
+  bottom: -24px;
+  left: -24px;
+  width: 140px;
+  height: 140px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-gold);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.about__badge-num {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 300;
+  color: var(--gold);
+  line-height: 1;
+}
+
+.about__badge-text {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   ADVANTAGES
+   ============================================================ */
+.advantages__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.advantage {
+  padding: 48px 40px;
+  background: var(--bg-card);
+  transition: background var(--transition);
+  position: relative;
+  overflow: hidden;
+}
+
+.advantage::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  transform: scaleX(0);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.advantage:hover { background: var(--bg-card-hover); }
+.advantage:hover::before { transform: scaleX(1); }
+
+.advantage__icon {
+  font-size: 28px;
+  margin-bottom: 24px;
+  display: block;
+}
+
+.advantage__title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.advantage__text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* ============================================================
+   SERVICES
+   ============================================================ */
+.services__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.service-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+  cursor: pointer;
+}
+
+.service-card:hover {
+  transform: translateY(-6px);
+  border-color: var(--border-gold);
+  box-shadow: var(--shadow-card), var(--shadow-gold);
+}
+
+.service-card__img {
+  height: 220px;
+  background: linear-gradient(135deg, #161618 0%, #1a1a1c 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 64px;
+  position: relative;
+  overflow: hidden;
+  transition: transform var(--transition);
+}
+.service__item {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* Отступ между иконкой и текстом */
+  margin-bottom: 20px;
+}
+
+.service__icon {
+  width: 100%; /* Размер иконки */
+  height: 100%;
+  object-fit: contain; /* Картинка не сожмется */
+}
+.service-card:hover .service-card__img { transform: scale(1.03); }
+
+.service-card__img-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 80% at 50% 30%, rgba(201,168,76,0.06) 0%, transparent 70%);
+}
+
+.service-card__body {
+  padding: 28px;
+}
+
+.service-card__time {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  color: var(--gold);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.service-card__title {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.service-card__desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.service-card__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.service-card__price {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--text-primary);
+}
+
+.service-card__price span {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
+.service-card__btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--border-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-size: 18px;
+  transition: background var(--transition), border-color var(--transition);
+}
+
+.service-card__btn:hover {
+  background: var(--gold);
+  color: #0C0C0D;
+}
+
+/* ============================================================
+   PRICE
+   ============================================================ */
+.price__cols {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.price__col {
+  background: var(--bg-card);
+  padding: 48px 36px;
+}
+
+.price__col--featured {
+  background: linear-gradient(135deg, #1A1A1C 0%, #161618 100%);
+  border-left: 1px solid var(--border-gold);
+  border-right: 1px solid var(--border-gold);
+  position: relative;
+}
+
+.price__col-label {
+  font-size: 10px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 28px;
+}
+
+.price__items { list-style: none; }
+
+.price__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 16px;
+}
+
+.price__item:last-child { border-bottom: none; }
+
+.price__item-name {
+  font-size: 15px;
+  color: var(--text-secondary);
+  font-weight: 300;
+}
+/*.price__item-dots {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  margin: 0 8px;
+  align-self: center;
+}
+*/
+.price__item-cost {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.price__item-cost span {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   TEAM
+   ============================================================ */
+.team__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.barber-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  transition: transform var(--transition), border-color var(--transition);
+}
+
+.barber-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-gold);
+}
+
+.barber-card__img {
+  height: 280px;
+  background: linear-gradient(135deg, #161618 0%, #111112 100%);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.barber-card__avatar {
+  font-size: 100px;
+  line-height: 1;
+  margin-bottom: -10px;
+  position: relative;
+  z-index: 1;
+}
+
+.barber-card__img::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 80%, rgba(201,168,76,0.08) 0%, transparent 60%);
+}
+
+.barber-card__body {
+  padding: 24px;
+}
+
+.barber-card__exp {
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.barber-card__name {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.barber-card__role {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.barber-card__skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.barber-card__skill {
+  font-size: 11px;
+  color: var(--text-muted);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================================
+   PORTFOLIO
+   ============================================================ */
+.portfolio__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto auto;
+  gap: 16px;
+}
+
+.portfolio__item {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--bg-card);
+}
+
+.portfolio__item:first-child {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.portfolio__item-inner {
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, #1A1A1C 0%, #111112 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 48px;
+  position: relative;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.portfolio__item:first-child .portfolio__item-inner {
+  aspect-ratio: auto;
+  height: 100%;
+  min-height: 400px;
+  font-size: 80px;
+}
+
+.portfolio__item:hover .portfolio__item-inner { transform: scale(1.05); }
+
+.portfolio__item-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity var(--transition);
+  display: flex;
+  align-items: flex-end;
+  padding: 20px;
+}
+
+.portfolio__item:hover .portfolio__item-overlay { opacity: 1; }
+
+.portfolio__item-label {
+  font-size: 13px;
+  color: var(--text-primary);
+  letter-spacing: 0.05em;
+}
+
+.portfolio__item-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 80% at 50% 50%, rgba(201,168,76,0.05) 0%, transparent 70%);
+}
+
+/* ============================================================
+   REVIEWS
+   ============================================================ */
+.reviews__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.review-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 36px;
+  border: 1px solid var(--border);
+  transition: border-color var(--transition), transform var(--transition);
+}
+
+.review-card:hover {
+  border-color: var(--border-gold);
+  transform: translateY(-3px);
+}
+
+.review-card__stars {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.review-card__star { color: var(--gold); font-size: 14px; }
+
+.review-card__text {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.75;
+  margin-bottom: 24px;
+  font-style: italic;
+}
+
+.review-card__author {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.review-card__avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--bg-primary), var(--bg-card-hover));
+  border: 1px solid var(--border-gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.review-card__name {
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--text-primary);
+}
+
+.review-card__date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ============================================================
+   PROCESS
+   ============================================================ */
+.process__steps {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+  position: relative;
+}
+
+.process__steps::before {
+  content: '';
+  position: absolute;
+  top: 36px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-gold), var(--border-gold), var(--border-gold), transparent);
+}
+
+.process__step {
+  text-align: center;
+  padding: 0 20px;
+}
+
+.process__step-num {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 1px solid var(--border-gold);
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 28px;
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 300;
+  color: var(--gold);
+  position: relative;
+  z-index: 1;
+  transition: background var(--transition), box-shadow var(--transition);
+}
+
+.process__step:hover .process__step-num {
+  background: var(--gold);
+  color: #0C0C0D;
+  box-shadow: var(--shadow-gold);
+}
+
+.process__step-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+}
+
+.process__step-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ============================================================
+   FAQ
+   ============================================================ */
+.faq__list {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.faq__item {
+  border-bottom: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.faq__question {
+  width: 100%;
+  padding: 28px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+}
+
+.faq__question-text {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--text-primary);
+  transition: color var(--transition);
+}
+
+.faq__question:hover .faq__question-text { color: var(--gold); }
+
+.faq__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text-muted);
+  font-size: 18px;
+  transition: all var(--transition);
+}
+
+.faq__item.open .faq__icon {
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: rotate(45deg);
+}
+
+.faq__answer {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.faq__answer-inner {
+  padding-bottom: 28px;
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+}
+
+.faq__item.open .faq__answer { max-height: 300px; }
+
+/* ============================================================
+   BOOKING FORM
+   ============================================================ */
+.booking {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.booking::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(ellipse, rgba(201,168,76,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.booking__inner {
+  max-width: 720px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+}
+
+.booking__form {
+  margin-top: 56px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  text-align: left;
+}
+
+.form__group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form__group--full { grid-column: span 2; }
+
+.form__label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.form__input,
+.form__select {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+  font-size: 15px;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-weight: 300;
+  transition: border-color var(--transition), box-shadow var(--transition);
+  width: 100%;
+  -webkit-appearance: none;
+}
+
+.form__input:focus,
+.form__select:focus {
+  outline: none;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(201,168,76,0.1);
+}
+
+.form__input::placeholder { color: var(--text-muted); }
+
+.form__select { cursor: pointer; }
+.form__select option { background: var(--bg-card); }
+
+.form__submit {
+  grid-column: span 2;
+  margin-top: 8px;
+}
+
+.form__submit .btn-primary {
+  width: 100%;
+  justify-content: center;
+  padding: 18px 32px;
+  font-size: 13px;
+}
+
+.booking__success {
+  display: none;
+  text-align: center;
+  padding: 60px 0;
+}
+
+.booking__success-icon {
+  font-size: 64px;
+  margin-bottom: 24px;
+  display: block;
+}
+
+.booking__success-title {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 300;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.booking__success-text {
+  font-size: 16px;
+  color: var(--text-secondary);
+}
+
+/* ============================================================
+   CONTACTS
+   ============================================================ */
+.contacts__grid {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.contacts__info {}
+
+.contact__item {
+  display: flex;
+  gap: 20px;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.contact__item:first-child { padding-top: 0; }
+
+.contact__icon {
+  font-size: 20px;
+  color: var(--gold);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.contact__label {
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 6px;
+}
+
+.contact__value {
+  font-size: 16px;
+  color: var(--text-primary);
+  font-weight: 300;
+}
+
+.contact__value a:hover { color: var(--gold); }
+
+.contacts__map {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  height: 400px;
+  background: linear-gradient(135deg, #161618 0%, #111112 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  position: relative;
+}
+
+.contacts__map-placeholder {
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.contacts__map-icon { font-size: 48px; margin-bottom: 12px; display: block; }
+.contacts__map-text { font-size: 14px; }
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.footer {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  padding: 64px 48px 40px;
+}
+
+.footer__top {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr;
+  gap: 60px;
+  padding-bottom: 56px;
+  border-bottom: 1px solid var(--border);
+}
+
+.footer__brand-logo {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 300;
+  letter-spacing: 0.15em;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.footer__brand-logo span { color: var(--gold); }
+
+.footer__brand-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 260px;
+}
+
+.footer__col-title {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+}
+
+.footer__col-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer__col-links a {
+  font-size: 14px;
+  color: var(--text-secondary);
+  transition: color var(--transition);
+  font-weight: 300;
+}
+
+.footer__col-links a:hover { color: var(--gold); }
+
+.footer__bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 32px;
+}
+
+.footer__copy {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.footer__socials {
+  display: flex;
+  gap: 20px;
+}
+
+.footer__social {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--text-muted);
+  transition: all var(--transition);
+}
+
+.footer__social:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201,168,76,0.08);
+}
+
+/* ============================================================
+   FLOATING CTA
+   ============================================================ */
+.floating-cta {
+  position: fixed;
+  right: 32px;
+  bottom: 40px;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+}
+
+.floating-cta.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.floating-cta__btn {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #0C0C0D;
+  box-shadow: 0 8px 32px rgba(201,168,76,0.35);
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.floating-cta__btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 12px 40px rgba(201,168,76,0.45);
+}
+
+/* ============================================================
+   REVEAL ANIMATIONS
+   ============================================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.9);
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1200px) {
+  .team__grid { grid-template-columns: repeat(2, 1fr); }
+  .hero__stats { right: 24px; gap: 32px; }
+}
+
+@media (max-width: 1024px) {
+  .nav__links { display: none; }
+  .nav__cta .btn-primary { display: none; }
+  .nav__burger { display: flex; }
+  .nav { padding: 0 24px; }
+
+  .hero__visual { width: 60%; }
+  .hero__content { padding: 0 24px var(--space-2xl); }
+  .hero__stats { display: none; }
+
+  .section { padding: 80px 24px; }
+
+  .about { grid-template-columns: 1fr; gap: 48px; }
+  .about__right { order: -1; }
+
+  .advantages__grid { grid-template-columns: repeat(2, 1fr); }
+  .services__grid { grid-template-columns: repeat(2, 1fr); }
+  .price__cols { grid-template-columns: 1fr; }
+  .price__col--featured { border: none; border-top: 1px solid var(--border-gold); border-bottom: 1px solid var(--border-gold); }
+  .team__grid { grid-template-columns: repeat(2, 1fr); }
+  .portfolio__grid { grid-template-columns: repeat(2, 1fr); }
+  .portfolio__item:first-child { grid-column: 1; grid-row: 1; }
+  .reviews__grid { grid-template-columns: 1fr 1fr; }
+  .process__steps { grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .process__steps::before { display: none; }
+  .contacts__grid { grid-template-columns: 1fr; gap: 48px; }
+  .footer__top { grid-template-columns: 1fr 1fr; gap: 40px; }
+}
+
+@media (max-width: 768px) {
+  .advantages__grid { grid-template-columns: 1fr; }
+  .services__grid { grid-template-columns: 1fr; }
+  .team__grid { grid-template-columns: 1fr 1fr; }
+  .portfolio__grid { grid-template-columns: repeat(2, 1fr); }
+  .reviews__grid { grid-template-columns: 1fr; }
+  .process__steps { grid-template-columns: 1fr 1fr; }
+  .section__header { flex-direction: column; align-items: flex-start; }
+  .booking__form { grid-template-columns: 1fr; }
+  .form__group--full { grid-column: span 1; }
+  .form__submit { grid-column: span 1; }
+  .footer__top { grid-template-columns: 1fr; }
+  .footer__bottom { flex-direction: column; gap: 20px; text-align: center; }
+  .menu-overlay { padding: 80px 24px 40px; }
+}
+
+@media (max-width: 480px) {
+  .hero__title { font-size: clamp(36px, 10vw, 52px); }
+  .hero__actions { flex-direction: column; align-items: flex-start; }
+  .team__grid { grid-template-columns: 1fr; }
+  .portfolio__grid { grid-template-columns: 1fr; }
+  .portfolio__item:first-child .portfolio__item-inner { min-height: 260px; }
+  .process__steps { grid-template-columns: 1fr; }
+  .loader__logo { font-size: 32px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body class="loading">
+
+<!-- ============================================================
+     CUSTOM CURSOR
+     ============================================================ -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-follower" id="cursorFollower"></div>
+
+<!-- ============================================================
+     LOADER
+     ============================================================ -->
+<div id="loader" role="status" aria-label="Загрузка сайта">
+  <div class="loader__logo" id="loaderLogo">NO<span>I</span>R</div>
+  <div class="loader__tagline" id="loaderTagline">Мастерство, которое говорит само за себя</div>
+  <div class="loader__line-wrap">
+    <div class="loader__line" id="loaderLine"></div>
+  </div>
+  <div class="loader__counter" id="loaderCounter">0%</div>
+</div>
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<header>
+  <nav class="nav" id="nav" role="navigation" aria-label="Основная навигация">
+    <a href="#home" class="nav__logo" aria-label="NOIR Barbershop — на главную">NO<span>I</span>R</a>
+
+    <ul class="nav__links">
+      <li><a href="#about">О нас</a></li>
+      <li><a href="#services">Услуги</a></li>
+      <li><a href="#team">Мастера</a></li>
+      <li><a href="#portfolio">Работы</a></li>
+      <li><a href="#reviews">Отзывы</a></li>
+      <li><a href="#contacts">Контакты</a></li>
+    </ul>
+
+    <div class="nav__cta">
+      <a href="tel:+79991234567" class="nav__phone">+7 999 123-45-67</a>
+      <a href="#booking" class="btn-primary">Записаться</a>
+    </div>
+
+    <button class="nav__burger" id="burger" aria-label="Открыть меню" aria-expanded="false">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </nav>
+</header>
+
+<!-- FULLSCREEN MENU -->
+<div class="menu-overlay" id="menuOverlay" role="dialog" aria-modal="true" aria-label="Меню навигации">
+  <div class="menu-overlay__inner">
+    <ul class="menu-overlay__nav" id="menuNav">
+      <li><a href="#about" class="menu-link"><span class="menu-overlay__num">01</span>О нас</a></li>
+      <li><a href="#services" class="menu-link"><span class="menu-overlay__num">02</span>Услуги</a></li>
+      <li><a href="#team" class="menu-link"><span class="menu-overlay__num">03</span>Команда</a></li>
+      <li><a href="#portfolio" class="menu-link"><span class="menu-overlay__num">04</span>Портфолио</a></li>
+      <li><a href="#reviews" class="menu-link"><span class="menu-overlay__num">05</span>Отзывы</a></li>
+      <li><a href="#booking" class="menu-link"><span class="menu-overlay__num">06</span>Запись</a></li>
+      <li><a href="#contacts" class="menu-link"><span class="menu-overlay__num">07</span>Контакты</a></li>
+    </ul>
+    <div class="menu-overlay__footer">
+      <a href="tel:+79991234567" class="menu-overlay__phone"></a>
+      <div class="menu-overlay__socials">
+        <a href="#" aria-label="Instagram">Instagram</a>
+        <a href="#" aria-label="VK">VK</a>
+        <a href="#" aria-label="Telegram">Telegram</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main id="home">
+
+  <!-- HERO -->
+  <section class="hero" aria-label="Главный экран">
+    <div class="hero__bg" aria-hidden="true"></div>
+    <div class="hero__grid" aria-hidden="true"></div>
+    <div class="hero__visual" aria-hidden="true">
+      <div class="hero__visual-inner"></div>
+      <div class="hero__scissors" aria-hidden="true">✂</div>
+    </div>
+
+    <div class="hero__content">
+      <div class="hero__eyebrow" id="heroEyebrow">
+        <div class="hero__eyebrow-line"></div>
+        <span class="hero__eyebrow-text">Премиальный барбершоп — Москва</span>
+      </div>
+
+      <h1 class="hero__title">
+        <span class="hero__title-line">Стрижка — это</span>
+        <span class="hero__title-line"><em>не услуга.</em></span>
+        <span class="hero__title-line">Это ритуал.</span>
+      </h1>
+
+      <p class="hero__subtitle" id="heroSubtitle">
+        Каждый визит создаётся с учётом формы лица, структуры волос и вашего образа жизни. Не стрижка — а точная работа мастера.
+      </p>
+
+      <div class="hero__actions" id="heroActions">
+        <a href="#booking" class="btn-primary">Записаться сейчас</a>
+        <a href="#services" class="btn-outline">Наши услуги</a>
+      </div>
+    </div>
+
+    <div class="hero__stats" id="heroStats" aria-label="Статистика барбершопа">
+      <div class="hero__stat">
+        <div class="hero__stat-num" data-count="2400">2400<span>+</span></div>
+        <div class="hero__stat-label">Клиентов</div>
+      </div>
+      <div class="hero__stat">
+        <div class="hero__stat-num" data-count="8">8<span> лет</span></div>
+        <div class="hero__stat-label">Опыта</div>
+      </div>
+      <div class="hero__stat">
+        <div class="hero__stat-num" data-count="98">98<span>%</span></div>
+        <div class="hero__stat-label">Довольных клиентов</div>
+      </div>
+    </div>
+
+
+  </section>
+
+  <!-- ABOUT -->
+  <section class="section" id="about" aria-label="О барбершопе">
+    <div class="about">
+      <div class="about__left reveal-left">
+        <div class="section__eyebrow">
+          <span class="section__eyebrow-line"></span>
+          <span class="section__eyebrow-label">О компании</span>
+        </div>
+        <h2 class="section__title">Восемь лет<br><em>безупречной</em><br>работы</h2>
+        <p class="about__text">
+          NOIR — это не просто барбершоп. Это пространство, где мужской стиль возведён в ранг искусства. Мы создавали его с нуля, понимая, что настоящий клиент приходит сюда не только за стрижкой.
+        </p>
+        <div class="about__quote">
+          <p class="about__quote-text">«Хорошая стрижка меняет то, как ты держишься. А это меняет всё остальное.»</p>
+        </div>
+        <p class="about__text" style="margin-top: 0;">
+          Каждый мастер прошёл авторскую систему обучения. Мы работаем только с профессиональной косметикой и постоянно совершенствуем технику — потому что результат должен говорить сам за себя.
+        </p>
+        <a href="#booking" class="btn-primary" style="margin-top: 32px;">Записаться к мастеру</a>
+      </div>
+
+      <div class="about__right reveal-right">
+        <div class="about__img-wrap">
+          <div class="about__img">
+  <div class="about__img-placeholder">
+    <img src="img/11.png" alt="Мое фото" class="about__picture">
+  </div>
+</div>
+          <div class="about__badge">
+            <span class="about__badge-num">8</span>
+            <span class="about__badge-text">Лет<br>опыта</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADVANTAGES -->
+  <section class="section section--dark" aria-label="Наши преимущества">
+    <div class="section__header">
+      <div class="reveal">
+        <div class="section__eyebrow">
+          <span class="section__eyebrow-line"></span>
+          <span class="section__eyebrow-label">Почему NOIR</span>
+        </div>
+        <h2 class="section__title">Стандарты,<br>которые <em>не снижаем</em></h2>
+      </div>
+    </div>
+
+    <div class="advantages__grid">
+      <div class="advantage reveal">
+        <span class="advantage__icon">✦</span>
+        <h3 class="advantage__title">Мастера с опытом от 5 лет</h3>
+        <p class="advantage__text">Каждый барбер прошёл авторское обучение и международные курсы. Ваш образ — в профессиональных руках.</p>
+      </div>
+      <div class="advantage reveal">
+        <span class="advantage__icon" style="color:var(--gold)">◈</span>
+        <h3 class="advantage__title">Стерильность и гигиена</h3>
+        <p class="advantage__text">Все инструменты стерилизуются после каждого клиента. Одноразовые расходники — обязательный стандарт, не исключение.</p>
+      </div>
+      <div class="advantage reveal">
+        <span class="advantage__icon">◎</span>
+        <h3 class="advantage__title">Профессиональная косметика</h3>
+        <p class="advantage__text">Используем только проверенные бренды: American Crew, Baxter of California, The Art of Shaving. Ничего дешевле.</p>
+      </div>
+      <div class="advantage reveal">
+        <span class="advantage__icon" style="color:var(--gold)">⬡</span>
+        <h3 class="advantage__title">Индивидуальный подход</h3>
+        <p class="advantage__text">Перед работой мастер изучает форму головы, тип волос и ваш образ жизни. Стрижка создаётся, а не повторяется.</p>
+      </div>
+      <div class="advantage reveal">
+        <span class="advantage__icon">◇</span>
+        <h3 class="advantage__title">Удобная онлайн-запись</h3>
+        <p class="advantage__text">Запись за 2 минуты: выбирайте мастера, услугу и удобное время. Напомним за сутки и за час до визита.</p>
+      </div>
+      <div class="advantage reveal">
+        <span class="advantage__icon" style="color:var(--gold)">✧</span>
+        <h3 class="advantage__title">Атмосфера без суеты</h3>
+        <p class="advantage__text">Пространство создано как антипод типовым парикмахерским: тихо, стильно, никакой спешки. Здесь можно выдохнуть.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SERVICES -->
+  <section class="section" id="services" aria-label="Услуги барбершопа">
+    <div class="section__header">
+      <div class="reveal">
+        <div class="section__eyebrow">
+          <span class="section__eyebrow-line"></span>
+          <span class="section__eyebrow-label">Услуги</span>
+        </div>
+        <h2 class="section__title">Всё, что нужно<br><em>настоящему</em> мужчине</h2>
+      </div>
+      <p class="section__subtitle reveal">Каждая процедура — это не просто технические действия, а полноценный ритуал заботы о себе.</p>
+    </div>
+
+    <div class="services__grid">
+      <article class="service-card reveal">
+        <div class="service-card__img">
+          <div class="service-card__img-bg"></div>
+          <div class="service__item">
+    <img src="img/21.jpg" alt="Стрижка" class="service__icon"></div>
+        </div>
+        <div class="service-card__body">
+          <div class="service-card__time">45 минут</div>
+          <h3 class="service-card__title">Классическая стрижка</h3>
+          <p class="service-card__desc">Стрижка ножницами и машинкой с учётом формы лица. Включает мытьё волос, укладку и стайлинг.</p>
+          <div class="service-card__footer">
+            <div class="service-card__price">1 800 <span>₽</span></div>
+            <a href="#booking" class="service-card__btn" aria-label="Записаться на классическую стрижку">→</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="service-card reveal">
+        <div class="service-card__img">
+          <div class="service-card__img-bg"></div>
+          <div class="service__item">
+    <img src="img/22.jpg" alt="Стрижка" class="service__icon"></div>
+        </div>
+        <div class="service-card__body">
+          <div class="service-card__time">30 минут</div>
+          <h3 class="service-card__title">Моделирование бороды</h3>
+          <p class="service-card__desc">Оформление контура, выравнивание линий и уход. Горячее полотенце и масло для бороды в подарок.</p>
+          <div class="service-card__footer">
+            <div class="service-card__price">1 200 <span>₽</span></div>
+            <a href="#booking" class="service-card__btn" aria-label="Записаться на моделирование бороды">→</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="service-card reveal">
+        <div class="service-card__img">
+          <div class="service-card__img-bg"></div>
+          <div class="service__item">
+    <img src="img/23.jpg" alt="Стрижка" class="service__icon"></div>
+        </div>
+        <div class="service-card__body">
+          <div class="service-card__time">60 минут</div>
+          <h3 class="service-card__title">Королевское бритьё</h3>
+          <p class="service-card__desc">Бритьё опасной бритвой с горячими полотенцами, маской и финальным уходом за кожей. Полное расслабление.</p>
+          <div class="service-card__footer">
+            <div class="service-card__price">2 400 <span>₽</span></div>
+            <a href="#booking" class="service-card__btn" aria-label="Записаться на королевское бритьё">→</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="service-card reveal">
+        <div class="service-card__img">
+          <div class="service-card__img-bg"></div>
+          <div class="service__item">
+    <img src="img/24.jpg" alt="Стрижка" class="service__icon"></div>
+        </div>
+        <div class="service-card__body">
+          <div class="service-card__time">90 минут</div>
+          <h3 class="service-card__title">Полный комплекс</h3>
+          <p class="service-card__desc">Стрижка + борода + бритьё + уход за кожей. Полное преображение в одном визите. Лучший выбор.</p>
+          <div class="service-card__footer">
+            <div class="service-card__price">3 600 <span>₽</span></div>
+            <a href="#booking" class="service-card__btn" aria-label="Записаться на полный комплекс">→</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="service-card reveal">
+        <div class="service-card__img">
+          <div class="service-card__img-bg"></div>
+          <div class="service__item">
+    <img src="img/25.jpg" alt="Стрижка" class="service__icon"></div>
+        </div>
+        <div class="service-card__body">
+          <div class="service-card__time">40 минут</div>
+          <h3 class="service-card__title">Уход за кожей лица</h3>
+          <p class="service-card__desc">Глубокое очищение, тонизирование и увлажнение. Профессиональная косметика для каждого типа кожи.</p>
+          <div class="service-card__footer">
+            <div class="service-card__price">1 600 <span>₽</span></div>
+            <a href="#booking" class="service-card__btn" aria-label="Записаться на уход за кожей">→</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="service-card reveal">
+        <div class="service-card__img">
+          <div class="service-card__img-bg"></div>
+          <div class="service__item">
+    <img src="img/26.jpg" alt="Стрижка" class="service__icon"></div>
+        </div>
+        <div class="service-card__body">
+          <div class="service-card__time">120 минут</div>
+          <h3 class="service-card__title">Окрашивание</h3>
+          <p class="service-card__desc">Тонирование, блонд, камуфляж седины. Используем только профессиональные краски Wella и Redken.</p>
+          <div class="service-card__footer">
+            <div class="service-card__price">от 3 000 <span>₽</span></div>
+            <a href="#booking" class="service-card__btn" aria-label="Записаться на окрашивание">→</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- PRICE -->
+  <section class="section section--dark" id="price" aria-label="Прайс-лист">
+    <div class="section__header">
+      <div class="reveal">
+        <div class="section__eyebrow">
+          <span class="section__eyebrow-line"></span>
+          <span class="section__eyebrow-label">Прайс</span>
+        </div>
+        <h2 class="section__title">Прозрачные<br><em>цены</em></h2>
+      </div>
+      <p class="section__subtitle reveal">Никаких скрытых доплат. Цена на сайте — это цена у кресла мастера.</p>
+    </div>
+
+    <div class="price__cols reveal">
+      <div class="price__col">
+        <div class="price__col-label">Стрижки</div>
+        <ul class="price__items">
+          <li class="price__item">
+            <span class="price__item-name">Классическая стрижка</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">1 800 <span>₽</span></span>
+          </li>
+          <li class="price__item">
+            <span class="price__item-name">Стрижка + укладка</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">2 200 <span>₽</span></span>
+          </li>
+          <li class="price__item">
+            <span class="price__item-name">Детская стрижка</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">1 200 <span>₽</span></span>
+          </li>
+          <li class="price__item">
+            <span class="price__item-name">Стрижка машинкой</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">1 400 <span>₽</span></span>
+          </li>
+          <li class="price__item">
+            <span class="price__item-name">Окрашивание</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">от 3 000 <span>₽</span></span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="price__col price__col--featured">
+        <div class="price__col-label">Борода и бритьё</div>
+        <ul class="price__items">
+          <li class="price__item">
+            <span class="price__item-name">Моделирование бороды</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">1 200 <span>₽</span></span>
+          </li>
+          <li class="price__item">
+            <span class="price__item-name">Оформление усов</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">600 <span>₽</span></span>
+          </li>
+          <li class="price__item">
+            <span class="price__item-name">Королевское бритьё</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">2 400 <span>₽</span></span>
+          </li>
+          <li class="price__item">
+            <span class="price__item-name">Уход за бородой</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">900 <span>₽</span></span>
+          </li>
+          <li class="price__item">
+            <span class="price__item-name">Стрижка + борода</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">2 800 <span>₽</span></span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="price__col">
+        <div class="price__col-label">Уход и комплексы</div>
+        <ul class="price__items">
+          <li class="price__item">
+            <span class="price__item-name">Уход за кожей лица</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">1 600 <span>₽</span></span>
+          </li>
+          <li class="price__item">
+            <span class="price__item-name">Полный комплекс</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">3 600 <span>₽</span></span>
+          </li>
+          <li class="price__item">
+            <span class="price__item-name">Скальп-терапия</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">1 400 <span>₽</span></span>
+          </li>
+          <li class="price__item">
+            <span class="price__item-name">Абонемент 10 стрижек</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">15 000 <span>₽</span></span>
+          </li>
+          <li class="price__item">
+            <span class="price__item-name">Подарочный сертификат</span>
+            <div class="price__item-dots"></div>
+            <span class="price__item-cost">от 2 000 <span>₽</span></span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section class="section" id="team" aria-label="Команда мастеров">
+    <div class="section__header">
+      <div class="reveal">
+        <div class="section__eyebrow">
+          <span class="section__eyebrow-line"></span>
+          <span class="section__eyebrow-label">Команда</span>
+        </div>
+        <h2 class="section__title">Мастера,<br>которым <em>доверяют</em></h2>
+      </div>
+      <a href="#booking" class="btn-outline reveal">Выбрать мастера</a>
+    </div>
+
+    <div class="team__grid">
+      <article class="barber-card reveal">
+        <div class="team__img-container">
+    <img src="img/31.jpg" alt="Александр Волков — Главный барбер" class="team__picture">
+  </div>
+        <div class="barber-card__body">
+          <div class="barber-card__exp">Опыт 9 лет</div>
+          <h3 class="barber-card__name">Александр Волков</h3>
+          <p class="barber-card__role">Главный барбер · Основатель</p>
+          
+        </div>
+      </article>
+
+      <article class="barber-card reveal">
+         <div class="team__img-container">
+    <img src="img/32.jpg" alt="Александр Волков — Главный барбер" class="team__picture">
+  </div>
+        <div class="barber-card__body">
+          <div class="barber-card__exp">Опыт 6 лет</div>
+          <h3 class="barber-card__name">Дмитрий Соколов</h3>
+          <p class="barber-card__role">Senior Барбер</p>
+          
+        </div>
+      </article>
+
+      <article class="barber-card reveal">
+         <div class="team__img-container">
+    <img src="img/33.jpg" alt="Александр Волков — Главный барбер" class="team__picture">
+  </div>
+        <div class="barber-card__body">
+          <div class="barber-card__exp">Опыт 5 лет</div>
+          <h3 class="barber-card__name">Илья Морозов</h3>
+          <p class="barber-card__role">Барбер · Стилист</p>
+          
+        </div>
+      </article>
+
+      <article class="barber-card reveal">
+         <div class="team__img-container">
+    <img src="img/34.png" alt="Александр Волков — Главный барбер" class="team__picture">
+  </div>
+        <div class="barber-card__body">
+          <div class="barber-card__exp">Опыт 5 лет</div>
+          <h3 class="barber-card__name">Максим Лебедев</h3>
+          <p class="barber-card__role">Барбер · Специалист по бороде</p>
+          
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- PORTFOLIO -->
+  <section class="section section--dark" id="portfolio" aria-label="Портфолио работ">
+    <div class="section__header">
+      <div class="reveal">
+        <div class="section__eyebrow">
+          <span class="section__eyebrow-line"></span>
+          <span class="section__eyebrow-label">Портфолио</span>
+        </div>
+        <h2 class="section__title">Работы,<br>которые <em>говорят</em><br>за нас</h2>
+      </div>
+      <a href="#booking" class="btn-outline reveal">Записаться</a>
+    </div>
+
+    <div class="portfolio__grid">
+      <div class="portfolio__item reveal-scale">
+        <div class="portfolio__item-inner">
+          <div class="portfolio__item-bg">
+            <img src="img/1.png" alt="Классический фейд от Александра" class="portfolio__picture">
+          </div>
+          
+        </div>
+        <div class="portfolio__item-overlay">
+          <span class="portfolio__item-label"></span>
+        </div>
+      </div>
+      <div class="portfolio__item reveal-scale">
+        <div class="portfolio__item-inner">
+          <div class="portfolio__item-bg"></div>
+          <img src="img/2.png" alt="Классический фейд от Александра" class="portfolio__picture">
+        </div>
+        <div class="portfolio__item-overlay">
+          <span class="portfolio__item-label"></span>
+        </div>
+      </div>
+      <div class="portfolio__item reveal-scale">
+        <div class="portfolio__item-inner">
+          <div class="portfolio__item-bg"></div>
+          <img src="img/3.png" alt="Классический фейд от Александра" class="portfolio__picture">
+        </div>
+        <div class="portfolio__item-overlay">
+          <span class="portfolio__item-label"></span>
+        </div>
+      </div>
+      <div class="portfolio__item reveal-scale">
+        <div class="portfolio__item-inner">
+          <div class="portfolio__item-bg"></div>
+          <img src="img/4.png" alt="Классический фейд от Александра" class="portfolio__picture">
+        </div>
+        <div class="portfolio__item-overlay">
+          <span class="portfolio__item-label"></span>
+        </div>
+      </div>
+      <div class="portfolio__item reveal-scale">
+        <div class="portfolio__item-inner">
+          <div class="portfolio__item-bg"></div>
+          <img src="img/5.png" alt="Классический фейд от Александра" class="portfolio__picture">
+        </div>
+        <div class="portfolio__item-overlay">
+          <span class="portfolio__item-label"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS -->
+  <section class="section" id="reviews" aria-label="Отзывы клиентов">
+    <div class="section__header">
+      <div class="reveal">
+        <div class="section__eyebrow">
+          <span class="section__eyebrow-line"></span>
+          <span class="section__eyebrow-label">Отзывы</span>
+        </div>
+        <h2 class="section__title">Что говорят<br>те, кто уже <em>пришёл</em></h2>
+      </div>
+    </div>
+
+    <div class="reviews__grid">
+      <article class="review-card reveal">
+        <div class="review-card__stars">★★★★★</div>
+        <p class="review-card__text">«Первый раз пришёл случайно — теперь хожу только сюда. Александр слышит с первого раза, что нужно, и делает именно это. Атмосфера в зале отдельная история — никакого шума, можно нормально поговорить или просто помолчать.»</p>
+        <div class="review-card__author">
+          
+          <div>
+            <div class="review-card__name">Антон Ш.</div>
+            <div class="review-card__date">Клиент с 2022 года</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="review-card reveal">
+        <div class="review-card__stars">★★★★★</div>
+        <p class="review-card__text">«Работаю в IT, всегда хотел выглядеть аккуратно, но без лишних усилий. Дмитрий подобрал такую стрижку, что укладка занимает 3 минуты. Три года хожу каждые три недели — это уже ритуал.»</p>
+        <div class="review-card__author">
+          
+          <div>
+            <div class="review-card__name">Кирилл Т.</div>
+            <div class="review-card__date">Клиент с 2021 года</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="review-card reveal">
+        <div class="review-card__stars">★★★★★</div>
+        <p class="review-card__text">«Взял абонемент после первого визита. Цена честная, качество стабильное. Максим работает с бородой как хирург — чётко, быстро и красиво. Рекомендую всем коллегам.»</p>
+        <div class="review-card__author">
+          
+          <div>
+            <div class="review-card__name">Роман Е.</div>
+            <div class="review-card__date">Клиент с 2023 года</div>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="section section--dark" id="process" aria-label="Процесс работы">
+    <div class="section__header" style="text-align:center; display:block; margin-bottom: 72px;">
+      <div class="reveal">
+        <div class="section__eyebrow" style="justify-content:center;">
+          <span class="section__eyebrow-line"></span>
+          <span class="section__eyebrow-label">Как это работает</span>
+          <span class="section__eyebrow-line"></span>
+        </div>
+        <h2 class="section__title">Пять шагов<br>к <em>идеальному</em> образу</h2>
+      </div>
+    </div>
+
+    <div class="process__steps">
+      <div class="process__step reveal">
+        <div class="process__step-num">1</div>
+        <h3 class="process__step-title">Запись онлайн</h3>
+        <p class="process__step-desc">Выбирайте мастера, услугу и время. Всё занимает 2 минуты.</p>
+      </div>
+      <div class="process__step reveal">
+        <div class="process__step-num">2</div>
+        <h3 class="process__step-title">Консультация</h3>
+        <p class="process__step-desc">Мастер изучает ваш тип волос, форму лица и пожелания.</p>
+      </div>
+      <div class="process__step reveal">
+        <div class="process__step-num">3</div>
+        <h3 class="process__step-title">Работа</h3>
+        <p class="process__step-desc">Профессиональная стрижка с полным погружением в детали.</p>
+      </div>
+      <div class="process__step reveal">
+        <div class="process__step-num">4</div>
+        <h3 class="process__step-title">Финальный уход</h3>
+        <p class="process__step-desc">Укладка, стайлинг и финальная обработка. Всё до мелочей.</p>
+      </div>
+      <div class="process__step reveal">
+        <div class="process__step-num">5</div>
+        <h3 class="process__step-title">Рекомендации</h3>
+        <p class="process__step-desc">Мастер объяснит, как поддерживать образ дома до следующего визита.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq" aria-label="Часто задаваемые вопросы">
+    <div class="section__header" style="text-align:center; display:block; margin-bottom: 64px;">
+      <div class="reveal">
+        <div class="section__eyebrow" style="justify-content:center;">
+          <span class="section__eyebrow-line"></span>
+          <span class="section__eyebrow-label">FAQ</span>
+          <span class="section__eyebrow-line"></span>
+        </div>
+        <h2 class="section__title">Ответы на<br><em>частые</em> вопросы</h2>
+      </div>
+    </div>
+
+    <div class="faq__list reveal" role="list">
+      <div class="faq__item" role="listitem">
+        <button class="faq__question" aria-expanded="false">
+          <span class="faq__question-text">Нужно ли записываться заранее?</span>
+          <span class="faq__icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq__answer" role="region">
+          <div class="faq__answer-inner">
+            Да, рекомендуем записываться заранее — особенно на выходных. Онлайн-запись работает круглосуточно. Если хотите прийти в тот же день — позвоните, уточним наличие свободного времени у вашего мастера.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq__item" role="listitem">
+        <button class="faq__question" aria-expanded="false">
+          <span class="faq__question-text">Как выбрать подходящую стрижку?</span>
+          <span class="faq__icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq__answer" role="region">
+          <div class="faq__answer-inner">
+            Не нужно ничего выбирать самостоятельно — это задача мастера. На консультации он изучит форму вашей головы, тип и густоту волос, образ жизни и пожелания. После этого предложит несколько вариантов и объяснит, почему именно они подойдут.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq__item" role="listitem">
+        <button class="faq__question" aria-expanded="false">
+          <span class="faq__question-text">Как часто нужно стричься?</span>
+          <span class="faq__icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq__answer" role="region">
+          <div class="faq__answer-inner">
+            Зависит от стрижки и темпа роста волос. В среднем — раз в 3–4 недели для коротких стрижек и раз в 5–6 недель для более длинных. Мастер порекомендует оптимальный интервал именно для вас.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq__item" role="listitem">
+        <button class="faq__question" aria-expanded="false">
+          <span class="faq__question-text">Что входит в стоимость стрижки?</span>
+          <span class="faq__icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq__answer" role="region">
+          <div class="faq__answer-inner">
+            В стоимость классической стрижки входит консультация, мытьё волос, стрижка, укладка и рекомендации по уходу дома. Никаких скрытых доплат — цена на сайте равна цене у кресла мастера.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq__item" role="listitem">
+        <button class="faq__question" aria-expanded="false">
+          <span class="faq__question-text">Есть ли у вас абонементы или карты?</span>
+          <span class="faq__icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq__answer" role="region">
+          <div class="faq__answer-inner">
+            Да. Абонемент на 10 стрижек — 15 000 ₽ (экономия 3 000 ₽). Подарочные сертификаты от 2 000 ₽. Постоянным клиентам доступна система накопительных бонусов. Уточните у администратора при визите или по телефону.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq__item" role="listitem">
+        <button class="faq__question" aria-expanded="false">
+          <span class="faq__question-text">Вы принимаете детей?</span>
+          <span class="faq__icon" aria-hidden="true">+</span>
+        </button>
+        <div class="faq__answer" role="region">
+          <div class="faq__answer-inner">
+            Да, работаем с детьми от 4 лет. Стрижка — 1 200 ₽. Запись желательна: мастер заранее настроится на работу с ребёнком. У нас спокойная атмосфера без лишнего шума — дети обычно чувствуют себя комфортно.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BOOKING -->
+  <section class="section booking" id="booking" aria-label="Форма записи">
+    <div class="booking__inner">
+      <div class="reveal">
+        <div class="section__eyebrow" style="justify-content:center;">
+          <span class="section__eyebrow-line"></span>
+          <span class="section__eyebrow-label">Запись</span>
+          <span class="section__eyebrow-line"></span>
+        </div>
+        <h2 class="section__title" style="text-align:center;">Запишитесь<br><em>прямо сейчас</em></h2>
+        <p class="section__subtitle" style="text-align:center; margin: 0 auto;">Выберите мастера, услугу и удобное время. Подтверждение придёт на телефон в течение 5 минут.</p>
+      </div>
+
+      <form class="booking__form reveal" id="bookingForm" novalidate aria-label="Форма записи в барбершоп">
+        <div class="form__group">
+          <label class="form__label" for="name">Ваше имя</label>
+          <input class="form__input" type="text" id="name" name="name" placeholder="Александр" required autocomplete="given-name">
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="phone">Телефон</label>
+          <input class="form__input" type="tel" id="phone" name="phone" placeholder="+7 999 123-45-67" required autocomplete="tel">
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="service">Услуга</label>
+          <select class="form__select" id="service" name="service" required>
+            <option value="" disabled selected>Выберите услугу</option>
+            <option>Классическая стрижка — 1 800 ₽</option>
+            <option>Моделирование бороды — 1 200 ₽</option>
+            <option>Королевское бритьё — 2 400 ₽</option>
+            <option>Полный комплекс — 3 600 ₽</option>
+            <option>Уход за кожей лица — 1 600 ₽</option>
+            <option>Окрашивание — от 3 000 ₽</option>
+          </select>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="master">Мастер</label>
+          <select class="form__select" id="master" name="master">
+            <option value="" selected>Любой свободный</option>
+            <option>Александр Волков</option>
+            <option>Дмитрий Соколов</option>
+            <option>Илья Морозов</option>
+            <option>Максим Лебедев</option>
+          </select>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="date">Дата</label>
+          <input class="form__input" type="date" id="date" name="date" required>
+        </div>
+        <div class="form__group">
+          <label class="form__label" for="time">Удобное время</label>
+          <select class="form__select" id="time" name="time" required>
+            <option value="" disabled selected>Выберите время</option>
+            <option>10:00</option>
+            <option>11:00</option>
+            <option>12:00</option>
+            <option>13:00</option>
+            <option>14:00</option>
+            <option>15:00</option>
+            <option>16:00</option>
+            <option>17:00</option>
+            <option>18:00</option>
+            <option>19:00</option>
+            <option>20:00</option>
+          </select>
+        </div>
+        <div class="form__group form__group--full form__submit">
+          <button type="submit" class="btn-primary">
+            <span id="submitText">Записаться на визит</span>
+          </button>
+        </div>
+      </form>
+
+      <div class="booking__success" id="bookingSuccess" role="alert" aria-live="polite">
+        <span class="booking__success-icon">✓</span>
+        <h3 class="booking__success-title">Запись подтверждена</h3>
+        <p class="booking__success-text">Мы свяжемся с вами в течение 5 минут для уточнения деталей.<br>Увидимся в NOIR.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACTS -->
+  <section class="section section--dark" id="contacts" aria-label="Контактная информация">
+    <div class="section__header">
+      <div class="reveal">
+        <div class="section__eyebrow">
+          <span class="section__eyebrow-line"></span>
+          <span class="section__eyebrow-label">Контакты</span>
+        </div>
+        <h2 class="section__title">Найдите<br>нас <em>легко</em></h2>
+      </div>
+    </div>
+
+    <div class="contacts__grid">
+      <div class="contacts__info reveal-left">
+        <div class="contact__item">
+          <span class="contact__icon">📍</span>
+          <div>
+            <div class="contact__label">Адрес</div>
+            <div class="contact__value">Москва, ул. Тверская, 15, этаж 2<br>Вход со двора, домофон 15</div>
+          </div>
+        </div>
+        <div class="contact__item">
+          <span class="contact__icon">📞</span>
+          <div>
+            <div class="contact__label">Телефон</div>
+            <div class="contact__value"><a href="tel:+79991234567">+7 999 123-45-67</a></div>
+          </div>
+        </div>
+        <div class="contact__item">
+          <span class="contact__icon">🕐</span>
+          <div>
+            <div class="contact__label">Режим работы</div>
+            <div class="contact__value">Пн–Пт: 10:00 – 21:00<br>Сб–Вс: 10:00 – 20:00</div>
+          </div>
+        </div>
+        <div class="contact__item">
+          <span class="contact__icon">✉️</span>
+          <div>
+            <div class="contact__label">Email</div>
+            <div class="contact__value"><a href="mailto:hello@noir-barbershop.ru">hello@noir-barbershop.ru</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="contacts__map reveal-right">
+        <div class="contacts__map-placeholder">
+          <span class="contacts__map-icon">🗺</span>
+          <div class="contacts__map-text">Москва, ул. Тверская, 15</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer" role="contentinfo">
+  <div class="footer__top">
+    <div>
+      <div class="footer__brand-logo">NO<span>I</span>R</div>
+      <p class="footer__brand-desc">Премиальный мужской барбершоп в Москве. Мастерство, которое говорит само за себя.</p>
+    </div>
+    <div>
+      <div class="footer__col-title">Услуги</div>
+      <ul class="footer__col-links">
+        <li><a href="#services">Стрижки</a></li>
+        <li><a href="#services">Борода</a></li>
+        <li><a href="#services">Бритьё</a></li>
+        <li><a href="#services">Уход за кожей</a></li>
+        <li><a href="#price">Прайс-лист</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer__col-title">Барбершоп</div>
+      <ul class="footer__col-links">
+        <li><a href="#about">О нас</a></li>
+        <li><a href="#team">Мастера</a></li>
+        <li><a href="#portfolio">Портфолио</a></li>
+        <li><a href="#reviews">Отзывы</a></li>
+        <li><a href="#faq">FAQ</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer__col-title">Связаться</div>
+      <ul class="footer__col-links">
+        <li><a href="tel:+79991234567">+7 999 123-45-67</a></li>
+        <li><a href="mailto:hello@noir-barbershop.ru">Email</a></li>
+        <li><a href="#" aria-label="Instagram">Instagram</a></li>
+        <li><a href="#" aria-label="VK">VKontakte</a></li>
+        <li><a href="#" aria-label="Telegram">Telegram</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer__bottom">
+    <div class="footer__copy">© 2024 NOIR Barbershop. Москва · Все права защищены</div>
+    <div class="footer__socials">
+      <a href="#" class="footer__social" aria-label="Instagram">IG</a>
+      <a href="#" class="footer__social" aria-label="VKontakte">VK</a>
+      <a href="#" class="footer__social" aria-label="Telegram">TG</a>
+    </div>
+  </div>
+</footer>
+
+<!-- FLOATING CTA -->
+<div class="floating-cta" id="floatingCta" aria-label="Быстрая запись">
+  <a href="#booking" class="floating-cta__btn" aria-label="Записаться" title="Записаться в NOIR">✂</a>
+</div>
+
+<!-- SCHEMA.ORG -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HairSalon",
+  "name": "NOIR Barbershop",
+  "description": "Премиальный мужской барбершоп в Москве",
+  "url": "https://noir-barbershop.ru",
+  "telephone": "+7-999-123-45-67",
+  "email": "hello@noir-barbershop.ru",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "ул. Тверская, 15",
+    "addressLocality": "Москва",
+    "addressCountry": "RU"
+  },
+  "openingHours": ["Mo-Fr 10:00-21:00", "Sa-Su 10:00-20:00"],
+  "priceRange": "₽₽₽",
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "5.0",
+    "reviewCount": "248"
+  }
+}
+</script>
+
+<script>
+/* ============================================================
+   GSAP INIT
+   ============================================================ */
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+
+/* ============================================================
+   LOADER
+   ============================================================ */
+(function initLoader() {
+  const loader = document.getElementById('loader');
+  const line   = document.getElementById('loaderLine');
+  const counter= document.getElementById('loaderCounter');
+  const logo   = document.getElementById('loaderLogo');
+  const tagline= document.getElementById('loaderTagline');
+
+  document.body.classList.add('loading');
+
+  const tl = gsap.timeline({
+    onComplete: () => {
+      gsap.to(loader, {
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power2.inOut',
+        onComplete: () => {
+          loader.style.display = 'none';
+          document.body.classList.remove('loading');
+          initHeroAnimation();
+        }
+      });
+    }
+  });
+
+  tl
+    .to(logo, { opacity: 1, duration: 0.6, ease: 'power2.out' })
+    .to(tagline, { opacity: 1, y: 0, duration: 0.5, ease: 'power2.out' }, '-=0.2')
+    .to(line, {
+      width: '100%',
+      duration: 1.6,
+      ease: 'power2.inOut',
+      onUpdate: function() {
+        const pct = Math.round(this.progress() * 100);
+        counter.textContent = pct + '%';
+      }
+    }, '-=0.1');
+})();
+
+/* ============================================================
+   HERO ANIMATION (runs after loader)
+   ============================================================ */
+function initHeroAnimation() {
+  const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+  tl
+    .to('.hero__title-line', {
+      y: 0,
+      duration: 1,
+      stagger: 0.15,
+      ease: 'power3.out'
+    })
+    .to('#heroEyebrow', { opacity: 1, y: 0, duration: 0.7 }, '-=0.5')
+    .to('#heroSubtitle', { opacity: 1, y: 0, duration: 0.7 }, '-=0.4')
+    .to('#heroActions',  { opacity: 1, y: 0, duration: 0.7 }, '-=0.3')
+    .to('#heroStats',    { opacity: 1,       duration: 0.7 }, '-=0.2')
+    .to('#heroScroll',   { opacity: 1,       duration: 0.5 }, '-=0.1');
+}
+
+/* ============================================================
+   SCROLL REVEAL
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+
+  // Generic reveal
+  gsap.utils.toArray('.reveal').forEach((el, i) => {
+    gsap.fromTo(el,
+      { opacity: 0, y: 50 },
+      {
+        opacity: 1, y: 0,
+        duration: 0.9,
+        delay: (i % 4) * 0.1,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: el,
+          start: 'top 85%',
+          toggleActions: 'play none none none'
+        }
+      }
+    );
+  });
+
+  gsap.utils.toArray('.reveal-left').forEach(el => {
+    gsap.fromTo(el,
+      { opacity: 0, x: -60 },
+      { opacity: 1, x: 0, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 80%', toggleActions: 'play none none none' }
+      }
+    );
+  });
+
+  gsap.utils.toArray('.reveal-right').forEach(el => {
+    gsap.fromTo(el,
+      { opacity: 0, x: 60 },
+      { opacity: 1, x: 0, duration: 1, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 80%', toggleActions: 'play none none none' }
+      }
+    );
+  });
+
+  gsap.utils.toArray('.reveal-scale').forEach((el, i) => {
+    gsap.fromTo(el,
+      { opacity: 0, scale: 0.88 },
+      {
+        opacity: 1, scale: 1,
+        duration: 0.8,
+        delay: i * 0.07,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+      }
+    );
+  });
+
+  // Staggered advantages
+  gsap.utils.toArray('.advantage').forEach((el, i) => {
+    gsap.fromTo(el,
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1, y: 0,
+        duration: 0.7,
+        delay: (i % 3) * 0.15,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
+      }
+    );
+  });
+
+  // Staggered service cards
+  gsap.utils.toArray('.service-card').forEach((el, i) => {
+    gsap.fromTo(el,
+      { opacity: 0, y: 50 },
+      {
+        opacity: 1, y: 0,
+        duration: 0.8,
+        delay: (i % 3) * 0.12,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+      }
+    );
+  });
+
+  // Staggered barber cards
+  gsap.utils.toArray('.barber-card').forEach((el, i) => {
+    gsap.fromTo(el,
+      { opacity: 0, y: 40 },
+      {
+        opacity: 1, y: 0,
+        duration: 0.7,
+        delay: i * 0.12,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' }
+      }
+    );
+  });
+
+  // Process steps
+  gsap.utils.toArray('.process__step').forEach((el, i) => {
+    gsap.fromTo(el,
+      { opacity: 0, y: 30 },
+      {
+        opacity: 1, y: 0,
+        duration: 0.6,
+        delay: i * 0.1,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: '.process__steps', start: 'top 80%', toggleActions: 'play none none none' }
+      }
+    );
+  });
+
+  // Section titles
+  gsap.utils.toArray('.section__title').forEach(el => {
+    gsap.fromTo(el,
+      { opacity: 0, y: 30 },
+      {
+        opacity: 1, y: 0,
+        duration: 0.9,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' }
+      }
+    );
+  });
+
+  // Hero parallax on scissors
+  gsap.to('.hero__scissors', {
+    y: -100,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '.hero',
+      start: 'top top',
+      end: 'bottom top',
+      scrub: 1
+    }
+  });
+
+  // Hero visual parallax
+  gsap.to('.hero__visual-inner', {
+    y: 60,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: '.hero',
+      start: 'top top',
+      end: 'bottom top',
+      scrub: 1
+    }
+  });
+
+  // Stat counters
+  const statEls = document.querySelectorAll('.hero__stat-num[data-count]');
+  statEls.forEach(el => {
+    const target = parseInt(el.dataset.count);
+    const suffix = el.innerHTML.replace(/^\d+/, '');
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top 90%',
+      once: true,
+      onEnter: () => {
+        gsap.fromTo({ val: 0 }, { val: target },
+          {
+            duration: 1.5,
+            ease: 'power2.out',
+            onUpdate: function() {
+              el.innerHTML = Math.round(this.targets()[0].val) + suffix;
+            }
+          }
+        );
+      }
+    });
+  });
+
+  // NAV scroll
+  const nav = document.getElementById('nav');
+  ScrollTrigger.create({
+    start: 100,
+    onEnter: () => nav.classList.add('scrolled'),
+    onLeaveBack: () => nav.classList.remove('scrolled')
+  });
+
+  // Floating CTA
+  const floatingCta = document.getElementById('floatingCta');
+  ScrollTrigger.create({
+    start: '20%',
+    onEnter: () => floatingCta.classList.add('visible'),
+    onLeaveBack: () => floatingCta.classList.remove('visible')
+  });
+});
+
+/* ============================================================
+   NAVIGATION — FULLSCREEN MENU
+   ============================================================ */
+const burger = document.getElementById('burger');
+const menuOverlay = document.getElementById('menuOverlay');
+const menuLinks = document.querySelectorAll('.menu-link');
+const menuNav   = document.getElementById('menuNav');
+
+function openMenu() {
+  burger.classList.add('active');
+  burger.setAttribute('aria-expanded', 'true');
+  menuOverlay.classList.add('open');
+  document.body.classList.add('menu-open');
+
+  // Animate links in
+  const links = menuOverlay.querySelectorAll('.menu-overlay__nav a');
+  gsap.to(links, {
+    y: 0,
+    duration: 0.6,
+    stagger: 0.07,
+    ease: 'power3.out',
+    delay: 0.3
+  });
+}
+
+function closeMenu() {
+  burger.classList.remove('active');
+  burger.setAttribute('aria-expanded', 'false');
+  menuOverlay.classList.remove('open');
+  document.body.classList.remove('menu-open');
+
+  const links = menuOverlay.querySelectorAll('.menu-overlay__nav a');
+  gsap.set(links, { y: '100%' });
+}
+
+burger.addEventListener('click', () => {
+  if (menuOverlay.classList.contains('open')) closeMenu();
+  else openMenu();
+});
+
+menuLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = link.getAttribute('href');
+    closeMenu();
+    setTimeout(() => {
+      const el = document.querySelector(target);
+      if (el) gsap.to(window, { duration: 0.8, scrollTo: { y: el, offsetY: 80 }, ease: 'power3.inOut' });
+    }, 600);
+  });
+});
+
+// Smooth scroll for all nav links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', (e) => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target && !a.classList.contains('menu-link')) {
+      e.preventDefault();
+      gsap.to(window, { duration: 0.8, scrollTo: { y: target, offsetY: 80 }, ease: 'power3.inOut' });
+    }
+  });
+});
+
+/* ============================================================
+   FAQ ACCORDION
+   ============================================================ */
+document.querySelectorAll('.faq__question').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item   = btn.closest('.faq__item');
+    const isOpen = item.classList.contains('open');
+
+    document.querySelectorAll('.faq__item').forEach(i => i.classList.remove('open'));
+    document.querySelectorAll('.faq__question').forEach(b => b.setAttribute('aria-expanded', 'false'));
+
+    if (!isOpen) {
+      item.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
+  });
+});
+
+/* ============================================================
+   BOOKING FORM
+   ============================================================ */
+document.getElementById('bookingForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const btn  = this.querySelector('.btn-primary');
+  const text = document.getElementById('submitText');
+
+  text.textContent = 'Отправляем...';
+  btn.style.opacity = '0.7';
+  btn.style.pointerEvents = 'none';
+
+  setTimeout(() => {
+    this.style.display = 'none';
+    const success = document.getElementById('bookingSuccess');
+    success.style.display = 'block';
+
+    gsap.fromTo(success,
+      { opacity: 0, y: 30, scale: 0.95 },
+      { opacity: 1, y: 0, scale: 1, duration: 0.7, ease: 'power3.out' }
+    );
+  }, 1200);
+});
+
+// Set min date for date input
+const dateInput = document.getElementById('date');
+if (dateInput) {
+  const today = new Date().toISOString().split('T')[0];
+  dateInput.setAttribute('min', today);
+}
+
+/* ============================================================
+   CUSTOM CURSOR
+   ============================================================ */
+const cursor = document.getElementById('cursor');
+const follower = document.getElementById('cursorFollower');
+
+if (window.matchMedia('(hover: hover)').matches) {
+  let mouseX = 0, mouseY = 0;
+  let followerX = 0, followerY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    gsap.to(cursor, { x: mouseX - 5, y: mouseY - 5, duration: 0.05 });
+  });
+
+  (function animateFollower() {
+    followerX += (mouseX - followerX) * 0.1;
+    followerY += (mouseY - followerY) * 0.1;
+    gsap.set(follower, { x: followerX - 18, y: followerY - 18 });
+    requestAnimationFrame(animateFollower);
+  })();
+
+  document.querySelectorAll('a, button, .service-card, .barber-card, .portfolio__item').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      gsap.to(follower, { scale: 2, opacity: 0.5, duration: 0.3 });
+      gsap.to(cursor, { scale: 0.5, duration: 0.3 });
+    });
+    el.addEventListener('mouseleave', () => {
+      gsap.to(follower, { scale: 1, opacity: 1, duration: 0.3 });
+      gsap.to(cursor, { scale: 1, duration: 0.3 });
+    });
+  });
+}
+</script>
+</body>
+</html>
